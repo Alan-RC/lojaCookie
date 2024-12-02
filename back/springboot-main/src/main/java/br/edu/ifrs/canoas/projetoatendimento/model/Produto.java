@@ -5,10 +5,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,14 +21,13 @@ import lombok.NoArgsConstructor;
 
 public class Produto {
     @Id
-    private int id;
-    private double valor;
+    @GeneratedValue
+    private Integer id;
     private String nome;
+    private Double preco;
     private String descricao;
-    private double peso;
-
-    @ManyToOne
-    private Marca marca;
+    @OneToMany(mappedBy = "produto")
+    private List<ItemCompra> itemCompraList = new ArrayList<>();
 
     public void create(){
         Conexao c = new Conexao();
@@ -38,7 +39,7 @@ public class Produto {
             PreparedStatement  ps = dbConn.prepareStatement(sql);
 
             ps.setInt(1, this.id);
-            ps.setDouble(2, this.valor);
+            ps.setDouble(2, this.preco);
             ps.setString(3, this.nome);
             ps.setString(4, this.descricao);
             ps.executeUpdate();
@@ -56,7 +57,7 @@ public class Produto {
         try {
             PreparedStatement  ps = dbConn.prepareStatement(sql);
             ps.setInt(1, this.id);
-            ps.setDouble(2, this.valor);
+            ps.setDouble(2, this.preco);
             ps.setString(3, this.nome);
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -91,9 +92,8 @@ public class Produto {
                 Produto produto = new Produto();
                 produto.setId(rs.getInt("id"));
                 produto.setNome(rs.getString("nome"));
-                produto.setValor(rs.getDouble("preco"));
+                produto.setPreco(rs.getDouble("preco"));
                 produto.setDescricao(rs.getString("descricao"));
-                produto.setPeso(rs.getDouble("peso"));
                 produtos.add(produto);
             }
         } catch (SQLException e) {
@@ -111,9 +111,8 @@ public class Produto {
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 this.nome = rs.getString("nome");
-                this.valor = rs.getDouble("preco");
+                this.preco = rs.getDouble("preco");
                 this.descricao = rs.getString("descricao");
-                this.peso = rs.getDouble("peso");
             }
         } catch (SQLException e) {
             e.printStackTrace();

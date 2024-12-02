@@ -1,41 +1,52 @@
 <!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
+    <style>
+        .tabelas{
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            & button{
+                width: 100px;
+            }
+            & table{
+                width: 300px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <p></p>
-    <form id="formularios">
-        <input type="hidden" name="id" id="id" value="-1">
-        <label for="nome">Nome</label>
-        <input type="text" name="nome" id="nome"><br>
-        <label for="preco">Preco</label>
-        <input type="text" name="preco" id="preco"><br>
-        <label for="peso">Peso</label>
-        <input type="text" name="peso" id="peso"><br>
+    <div class="tabelas">
+        <h1>Editar Pedido</h1>
+            <button type="button" onclick="adicionar()">Adicionar</button>
+            <!--adicionar button, e em onclick inclui a funcao adicionar-->
+            <button type="button" onclick="editar()">Editar</button>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Preco</th>
+                    <th>Descricao</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+        </table>
 
-        <textarea name="Nome" id="nome"></textarea>
-        <button type="button" onclick="adicionar()">Adicionar</button> <!--adicionar button, 
-                                                    e em onclick inclui a funcao adicionar-->
-        <button type="button onclick=editar()">Editar</button>
-    </form>
-    <a href=""></a>
-
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Produto</th>
-                <th>Preco</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody id="tabela">
-            <tr>
-                <td>Banana</td>
-                <td>6,50</td>
-            </tr>
-        </tbody>
-    </table>
-
+        <h2>Pedido Atual</h2>
+        <button type="button" onclick="populaTabelaGetout()">Listar Pedido</button>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Preco</th>
+                    <th>Descricao</th>
+                </tr>
+            </thead>
+            
+        </table>
+    </div>
+    <a href="/loja.html">Voltar para Menu</a>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
     function editar(id){
@@ -44,9 +55,7 @@
         $.get("https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"+id,
         function(produto){
             $("#nome").val(produto.nome);
-            $("#nome").val(produto.valor);
-            $("#nome").val(produto.peso);
-            $("#nome").val(produto.descricao);
+            $("#nome").val(produto.preco);
         }
     )
     }
@@ -79,7 +88,7 @@
     function adicionar(){
         alert("Cliquei");
         dados=$("#formularios").serialize();
-        $.post("http://localhost:8080/produto",dados, 
+        $.post("http://localhost:8080/produto",dados,
         function(data){
             alert("Inserido com sucesso")
             $("#tabela").html("")
@@ -93,13 +102,13 @@
                     let linha= `
                     <tr>
                         <td>${produto[i].nome}</td>
-                        <td>${produto[i].valor}</td>
+                        <td>${produto[i].preco}</td>
                         <td><button type="button" onclick="deletar(${produto[i].id})">Excluir</td>
                     </tr> `
                     $("#tabela").append(linha);//adiciona na tabela
                 }
             }
-        );   
+        );
     }
     populaTabelaGetout();
 </script>
