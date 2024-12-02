@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="cssalternativo.css">
+    <link rel="stylesheet" href="reponsividade.css">
+    <title>Carrinho</title>
+</head>
+<body>
+    <header class="cabecarioCarrinho">
+        <img src="logo.jpeg" alt="logoCookie">
+        <nav>
+            <ul>
+            <li><a href="loja.html">Home</a></li>
+            <li><a href="#">Produtos</a></li>
+            <li><a href="carrinho.html">Carrinho</a></li>
+        </ul>
+        </nav>
+    </header>
+    <section class="container">
+        <div class="list">
+            <div class="item active">
+                <div class="cookie">
+                    <img src="cookieTradicional.jpeg" alt="cookieTradicional">
+                </div>
+                <div class="content" style="transform: translateY(-120px);">
+                    <p class="information">Cookie</p>
+                    <h2>Tradicional</h2>
+                </div>
+            </div>
+            <div class="item">
+                <div class="cookie">
+                    <img src="cookieChocolate.jpeg" alt="cookieTradicional">
+                </div>
+                <div class="content" style="transform: translateY(-120px);">
+                    <p class="information">Cookie</p>
+                    <h2>Chocolate</h2>
+                </div>
+            </div>
+            <div class="item">
+                <div class="cookie">
+                    <img src="cookieBrigadeiro.jpeg" alt="cookieTradicional">
+                </div>
+                <div class="content" style="transform: translateY(-120px);">
+                    <p class="information">Cookie</p>
+                    <h2>Brigadeiro</h2>
+                </div>
+            </div>
+        </div>
+        <div class="arrow">
+            <button id="prev"><img src="arrow.png" alt="setaEsquerda"></button>
+            <button id="next"><img src="arrow.png" alt="setaDireita"></button>
+        </div>
+        <div class="indicadores">
+            <div class="number">01</div>
+            <ul>
+                <li class="active"></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </div>
+    </section>
+    <script src="scripts.js"></script>
+
+    <footer class="cadastro">
+    <p><strong>Faça seu Pedido Aqui!</strong></p>
+    <form id="formulario">
+        <input type="hidden" name="id" id="id">
+        <label for="nome">Cookie</label>
+        <input type="text" name="cookie" id="cookie">
+        <br>
+        <label for="preco">Quantidade</label>
+        <input type="text" name="preco" id="preco">
+        <br>
+        <label for="peso">Endereço</label>
+        <input type="text" name="peso" id="peso">
+
+        <button type="button" id="btnEditar" style="display: none;" onclick="editarFim()">Editar</button>
+        
+        <button type="button" id="btnAdicionar" onclick="adicionar()">Adicionar</button>
+    </form>
+
+    <table border="1">
+        <thead>
+            <tr> 
+                <th>Cookie</th>    <th>Quantidade</th> <th>Endereço</th>
+            </tr>
+        </thead>
+        <tbody id="tabela">
+   
+        </tbody>
+    </table>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>    
+<script>
+
+    function editar(id)
+    {
+        $.get( "http://localhost:8080/produto/" + id,
+
+                function( produto ) {
+                    $("#id").val(produto.id)
+                    $("#cookie").val(produto.cookie)
+                    $("#quantidade").val(produto.quantidade)
+                    $("#endereco").val(produto.endereco)
+                    $("#btnEditar").show()
+                    $("#btnAdicionar").hide()
+                }
+            );
+    }
+
+    function editarFim(){
+        dados = $("#formulario").serialize();//Transformando o meu formulario em um objetao
+        $.ajax({
+            url: "http://localhost:8080/produto",
+            data: dados,
+            type: 'PUT',
+            success: function(result) {
+                alert("Editado com sucesso")
+                $("#tabela").html("")
+                populaTabela();
+                
+                //Limpa campos
+                $("#cookie").val("")
+                $("#quantidade").val("")
+                $("#endereco").val("")
+                //Altera botões
+                $("#btnEditar").hide()
+                $("#btnAdicionar").show()
+            }
+        });
+    }
+
+    function deletar(id){
+        $.ajax({
+            url: "http://localhost:8080/produto",
+            data: {id: id},
+            type: 'DELETE',
+            success: function(result) {
+                alert("Deletado com sucesso")
+                $("#tabela").html("")
+                populaTabela();
+            }
+        });
+    }
+
+    function adicionar(){
+        dados = $("#formulario").serialize();//Transformando o meu formulario em um objetao
+        $.post( "http://localhost:8080/produto", //Rota spring boot
+                dados,  //Form
+                function( data ) {
+                    alert("inserido com sucesso")
+                    $("#tabela").html("")
+                    populaTabela();
+                }
+            );
+
+    }
+
+    function populaTabela(){
+        $.get( "http://localhost:8080/produtos",
+
+                function( produtos ) {
+
+                    for(i = 0; i < produtos.length; i++){
+                        let linha = ` 
+                            <tr>
+                                <td>${produtos[i].cookie}</td>  
+                                <td>${produtos[i].quantidade}</td>
+                                <td>${produtos[i].endereco}</td>
+                                <td>
+                                    <button type="button" 
+                                            onclick="deletar(${produtos[i].id})"> Excluir
+                                    </button>
+                                      <button type="button" 
+                                            onclick="editar(${produtos[i].id})"> Editar
+                                    </button>
+                                </td>
+                            </tr> 
+                        `
+                        $("#tabela").append(linha);//Adiciona na tabela
+                    }
+              
+                }
+            );
+    }
+    populaTabela();
+</script>
+    </footer>
+</body>
+</html>
