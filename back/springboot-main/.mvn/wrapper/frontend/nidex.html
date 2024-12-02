@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <p></p>
+    <form id="formularios">
+        <input type="hidden" name="id" id="id" value="-1">
+        <label for="nome">Nome</label>
+        <input type="text" name="nome" id="nome"><br>
+        <label for="preco">Preco</label>
+        <input type="text" name="preco" id="preco"><br>
+        <label for="peso">Peso</label>
+        <input type="text" name="peso" id="peso"><br>
+
+        <textarea name="Nome" id="nome"></textarea>
+        <button type="button" onclick="adicionar()">Adicionar</button> <!--adicionar button, 
+                                                    e em onclick inclui a funcao adicionar-->
+        <button type="button onclick=editar()">Editar</button>
+    </form>
+    <a href=""></a>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Preco</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="tabela">
+            <tr>
+                <td>Banana</td>
+                <td>6,50</td>
+            </tr>
+        </tbody>
+    </table>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+    function editar(id){
+        $("botaoEditar").show();
+        $("#botaoAdicionar").hide();
+        $.get("https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"+id,
+        function(produto){
+            $("#nome").val(produto.nome);
+            $("#nome").val(produto.valor);
+            $("#nome").val(produto.peso);
+            $("#nome").val(produto.descricao);
+        }
+    )
+    }
+    function editarFim(){
+        dados= $("#formulario").serialize();
+        $.ajax({
+            url:"http://localhost:8080/produto",
+            data:dados,
+            type:'Put',
+            success: function(result){
+                alert("Editado com Sucesso")
+                $("#tabela").html("")
+                populaTabelaGetout();
+            }
+        });
+
+    }
+    function deletar(id){
+        $.ajax({
+            url:"http://localhost:8080/produto",
+            data:{id: id},
+            type:'DELETE',
+            success: function(result){
+                alert("Deletado com Sucesso")
+                $("#tabela").html("")
+                populaTabelaGetout();
+            }
+        });
+    }
+    function adicionar(){
+        alert("Cliquei");
+        dados=$("#formularios").serialize();
+        $.post("http://localhost:8080/produto",dados, 
+        function(data){
+            alert("Inserido com sucesso")
+            $("#tabela").html("")
+            populaTabelaGetout();
+            });             //cadastrar produtos
+        }
+    function populaTabelaGetout(){ //listar produtos
+        $.get("http://localhost:8080/produto",
+            function(produto){
+                for(i=0; i<produto.length; i++){
+                    let linha= `
+                    <tr>
+                        <td>${produto[i].nome}</td>
+                        <td>${produto[i].valor}</td>
+                        <td><button type="button" onclick="deletar(${produto[i].id})">Excluir</td>
+                    </tr> `
+                    $("#tabela").append(linha);//adiciona na tabela
+                }
+            }
+        );   
+    }
+    populaTabelaGetout();
+</script>
+</body>
+</html>
