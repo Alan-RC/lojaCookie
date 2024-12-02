@@ -1,0 +1,56 @@
+@Data
+@Entity
+public class Compra {
+  @Id
+  @GeneratedValue
+  private Integer id;
+  private LocalDate dataCompra;
+  private Double valor;
+  @ManyToOne
+  @JoinColumn(name = "id_usuario")
+  private Usuario usuario;
+  @OneToMany(mappedBy = "compra")
+  private List<ItemCompra> itemCompraList = new ArrayList<>();
+}
+
+@Data
+@Entity
+public class ItemCompra {
+  @Id
+  @GeneratedValue
+  private Integer id;
+  private Double valor;
+  private Integer quantidade;
+  private Boolean devolucao;
+  @ManyToOne
+  @JoinColumn(name = "id_compra")
+  private Compra compra;
+  @ManyToOne
+  @JoinColumn(name = "id_produto")
+  private Produto produto;
+}
+
+@Data
+@Entity
+public class Produto {
+  @Id
+  @GeneratedValue
+  private Integer id;
+  private String nome;
+  private Double preco;
+  private String descricao;
+  @OneToMany(mappedBy = "produto")
+  private List<ItemCompra> itemCompraList = new ArrayList<>();
+}
+
+@Data
+@Entity
+public class Usuario {
+  @Id
+  @GeneratedValue
+  private Integer id;
+  private String nome;
+  private String endereco;
+  @OneToMany(mappedBy = "usuario")
+  private List<Compra> compraList = new ArrayList<>();
+}
